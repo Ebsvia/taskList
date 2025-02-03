@@ -24,10 +24,14 @@ cd task-list-app
 
 **2️⃣ Install Dependencies**
 
-npm install
+_npm install_
 
 **3️⃣ Start Dev Server**
 
-npm run dev
+_npm run dev_
 
 You will be able to see the application local on http://localhost:3000 in your browser.
+
+
+<img width="1158" alt="Screenshot 2025-02-03 at 21 29 10" src="https://github.com/user-attachments/assets/e333f49f-a132-493b-b00a-0cb75da55a89" />
+
