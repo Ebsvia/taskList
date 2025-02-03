@@ -1,95 +1,153 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import { useState, useEffect, useMemo, useCallback } from "react";
+import {
+  Box,
+  Container,
+  Typography,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  AppBar,
+  Toolbar,
+} from "@mui/material";
+
+interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+export default function TaskListApp() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [filter, setFilter] = useState<"all" | "completed" | "incomplete">(
+    "all"
+  );
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    open: boolean;
+    taskId: string | null;
+  }>({ open: false, taskId: null });
+
+  useEffect(() => {
+    const storedTasks = localStorage.getItem("tasks");
+    if (storedTasks) setTasks(JSON.parse(storedTasks));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
+  const addTask = useCallback((title: string) => {
+    setTasks((prevTasks) => [
+      ...prevTasks,
+      { id: crypto.randomUUID(), title, completed: false },
+    ]);
+  }, []);
+
+  const toggleTaskCompletion = useCallback((id: string) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  }, []);
+
+  const confirmDeleteTask = useCallback((id: string) => {
+    setDeleteConfirmation({ open: true, taskId: id });
+  }, []);
+
+  const deleteTask = useCallback(() => {
+    if (deleteConfirmation.taskId) {
+      setTasks((prevTasks) =>
+        prevTasks.filter((task) => task.id !== deleteConfirmation.taskId)
+      );
+    }
+    setDeleteConfirmation({ open: false, taskId: null });
+  }, [deleteConfirmation]);
+
+  const filteredTasks = useMemo(
+    () =>
+      tasks.filter((task) =>
+        filter === "completed"
+          ? task.completed
+          : filter === "incomplete"
+          ? !task.completed
+          : true
+      ),
+    [tasks, filter]
+  );
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(to right, #0f3633, #dcedc1)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "2rem 0",
+      }}
+    >
+      <Container
+        maxWidth="md"
+        sx={{
+          mt: 5,
+          textAlign: "center",
+          background: "#f5f7f5",
+          padding: "2rem",
+          borderRadius: "8px",
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+        }}
+      >
+        <AppBar position="static" sx={{ backgroundColor: "#0f3633" }}>
+          <Toolbar>
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+              Task Manager
+            </Typography>
+          </Toolbar>
+        </AppBar>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Box sx={{ mb: 2, mt: 3 }}>
+          {["all", "completed", "incomplete"].map((value) => (
+            <Button
+              key={value}
+              variant={filter === value ? "contained" : "outlined"}
+              onClick={() => setFilter(value as any)}
+              sx={{ mr: 1 }}
+            >
+              {value.charAt(0).toUpperCase() + value.slice(1)}
+            </Button>
+          ))}
+        </Box>
+
+        <Dialog
+          open={deleteConfirmation.open}
+          onClose={() => setDeleteConfirmation({ open: false, taskId: null })}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <DialogTitle>Delete Task</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to delete this task?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() =>
+                setDeleteConfirmation({ open: false, taskId: null })
+              }
+              color="primary"
+            >
+              Cancel
+            </Button>
+            <Button onClick={deleteTask} color="error">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    </Box>
   );
 }
