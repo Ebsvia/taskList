@@ -23,9 +23,11 @@ cd task-list-app
 ```
 
 **2️⃣ Install Dependencies**
+
 npm install
 
 **3️⃣ Start Dev Server**
+
 npm run dev
 
 You will be able to see the application local on http://localhost:3000 in your browser.
