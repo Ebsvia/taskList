@@ -14,6 +14,8 @@ import {
   AppBar,
   Toolbar,
 } from "@mui/material";
+import TaskList from "./components/TaskList";
+import TaskForm from "./components/TaskForm";
 
 interface Task {
   id: string;
@@ -110,6 +112,8 @@ export default function TaskListApp() {
           </Toolbar>
         </AppBar>
 
+        <TaskForm onAddTask={addTask} />
+
         <Box sx={{ mb: 2, mt: 3 }}>
           {["all", "completed", "incomplete"].map((value) => (
             <Button
@@ -122,6 +126,18 @@ export default function TaskListApp() {
             </Button>
           ))}
         </Box>
+
+        {filteredTasks.length === 0 ? (
+          <Typography variant="body1" color="textSecondary">
+            No tasks available
+          </Typography>
+        ) : (
+          <TaskList
+            tasks={filteredTasks}
+            onToggle={toggleTaskCompletion}
+            onDelete={confirmDeleteTask}
+          />
+        )}
 
         <Dialog
           open={deleteConfirmation.open}
