@@ -33,6 +33,7 @@ _npm run dev_
 You will be able to see the application local on http://localhost:3000 in your browser.
 
 
-<img width="1158" alt="Screenshot 2025-02-03 at 21 29 10" src="https://github.com/user-attachments/assets/d835c407-323d-489b-89a6-3000a95b11c4" />
+<img width="1292" alt="Screenshot 2025-02-03 at 21 48 42" src="https://github.com/user-attachments/assets/119e766d-3c5a-4b29-b816-e904910a7b3c" />
+
 
 
